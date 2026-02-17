@@ -2,58 +2,51 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import ScratchCard from 'react-scratchcard-v2';
-import JSConfetti from 'js-confetti';
-
-// Componentes de Ícones (Lucide React - se não tiver instalado, ele usa texto simples)
-// Se quiser instalar: npm install lucide-react
-import { Ticket, Gift, History, Share2, LogOut, Trophy } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import { Ticket, Gift, History, Share2, LogOut, Trophy, User } from 'lucide-react';
 
 export default function Dashboard() {
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [raspadinhaDisponivel, setRaspadinhaDisponivel] = useState(false);
-  const [premio, setPremio] = useState(null);
+  const [raspadinha, setRaspadinha] = useState(null);
+  const [revelado, setRevelado] = useState(false);
   const navigate = useNavigate();
-  const jsConfetti = new JSConfetti();
 
-  // Dados Fictícios para o Feed (depois conectamos no banco real)
+  // Dados Fictícios para o Feed (Enquanto não conectamos o real)
   const feedGanhadores = [
     { nome: 'Nicole S.', premio: 'Vale Café', tempo: 'há 5 min' },
-    { nome: 'Guilherme L.', premio: 'Ingresso Cinema', tempo: 'há 20 min' },
-    { nome: 'João P.', premio: 'Kit Prevision', tempo: 'há 1 hora' },
-  ];
-
-  // Dados Fictícios para o Histórico
-  const historicoPremios = [
-    { data: '10/02', premio: 'Vale Ifood R$ 30' },
-    { data: '15/01', premio: 'Caneca Personalizada' },
+    { nome: 'Guilherme L.', premio: 'Ingresso', tempo: 'há 20 min' },
+    { nome: 'João P.', premio: 'Kit Prevision', tempo: 'há 1h' },
   ];
 
   useEffect(() => {
-    fetchProfile();
-    checkRaspadinha();
+    fetchData();
   }, []);
 
-  const fetchProfile = async () => {
+  const fetchData = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return navigate('/');
 
-    // Busca o nome na tabela de perfis
-    const { data: perfil } = await supabase
+    // 1. Busca Perfil (Nome/Área)
+    let { data: perfil } = await supabase
       .from('perfis')
       .select('*')
       .eq('id', user.id)
       .single();
 
-    setUserProfile(perfil || { nome: user.email.split('@')[0] }); // Fallback se não achar perfil
-    setLoading(false);
-  };
+    if (!perfil) perfil = { nome: user.email.split('@')[0], area: 'Visitante' };
+    setUserProfile(perfil);
 
-  const checkRaspadinha = async () => {
-    // Aqui virá a lógica real. Por enquanto, vou simular que TEM uma raspadinha disponível
-    // Mude para false para testar o visual "sem raspadinha"
-    setRaspadinhaDisponivel(true); 
-    setPremio('Vale Café'); 
+    // 2. Busca Raspadinha Disponível
+    const { data: raspData } = await supabase
+      .from('historico_raspadinhas')
+      .select('*, premios(*)')
+      .eq('usuario_id', user.id)
+      .eq('revelada', false)
+      .maybeSingle(); // Usa maybeSingle para não dar erro se não tiver
+
+    if (raspData) setRaspadinha(raspData);
+    setLoading(false);
   };
 
   const handleLogout = async () => {
@@ -61,11 +54,19 @@ export default function Dashboard() {
     navigate('/');
   };
 
-  const onComplete = () => {
-    jsConfetti.addConfetti();
-    alert(`Parabéns! Você ganhou: ${premio}`);
-    setRaspadinhaDisponivel(false); // Some a raspadinha depois de usar
-    // Aqui salvaríamos no banco que o usuário já usou
+  const onComplete = async () => {
+    if (!raspadinha) return;
+    
+    setRevelado(true);
+    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    
+    // Atualiza no banco
+    await supabase
+      .from('historico_raspadinhas')
+      .update({ revelada: true })
+      .eq('id', raspadinha.id);
+      
+    alert(`PARABÉNS! Você ganhou: ${raspadinha.premios.nome}`);
   };
 
   if (loading) return <div style={styles.loading}>Carregando painel...</div>;
@@ -76,18 +77,21 @@ export default function Dashboard() {
       {/* --- HEADER --- */}
       <header style={styles.header}>
         <div style={styles.logoContainer}>
-          <Ticket color="#fff" size={28} style={{ marginRight: 10 }} />
+          <Ticket color="#fff" size={24} style={{ marginRight: 10 }} />
           <h1 style={styles.logoText}>Raspadinhas <span style={{color: '#93c5fd'}}>R&E</span></h1>
         </div>
         <div style={styles.userInfo}>
-          <span style={styles.welcomeText}>Olá, <b>{userProfile?.nome}</b></span>
+          <div style={styles.userDetails}>
+            <span style={styles.userName}>Olá, <b>{userProfile?.nome}</b></span>
+            <span style={styles.userArea}>{userProfile?.area}</span>
+          </div>
           <button onClick={handleLogout} style={styles.logoutButton}>
-            <LogOut size={18} /> Sair
+            <LogOut size={16} /> <span style={styles.logoutText}>Sair</span>
           </button>
         </div>
       </header>
 
-      {/* --- CONTEÚDO PRINCIPAL (Grid) --- */}
+      {/* --- CONTEÚDO PRINCIPAL --- */}
       <main style={styles.mainGrid}>
         
         {/* COLUNA ESQUERDA (Principal) */}
@@ -95,30 +99,35 @@ export default function Dashboard() {
           
           {/* Card da Raspadinha */}
           <div style={styles.card}>
-            <h2 style={styles.cardTitle}><Gift size={20} style={{marginRight: 8, color: '#2563eb'}}/> Suas Raspadinhas</h2>
+            <h2 style={styles.cardTitle}>
+              <Gift size={20} style={{marginRight: 8, color: '#2563eb'}}/> 
+              Suas Raspadinhas
+            </h2>
             
             <div style={styles.scratchArea}>
-              {raspadinhaDisponivel ? (
+              {raspadinha ? (
                 <div style={styles.scratchWrapper}>
+                  {!revelado && <p style={styles.instruction}>✨ Arraste para revelar seu prêmio! ✨</p>}
                   <ScratchCard
-                    width={320}
-                    height={160}
-                    image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png" // Imagem de cobertura (cinza ou personalizada)
-                    finishPercent={50}
+                    width={300}
+                    height={300}
+                    image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png"
+                    finishPercent={40}
                     onComplete={onComplete}
                   >
                     <div style={styles.prizeCard}>
-                      <Trophy size={40} color="#ca8a04" style={{marginBottom: 10}}/>
-                      <span style={styles.prizeText}>{premio}</span>
+                      <Trophy size={48} color="#d97706" style={{marginBottom: 10}}/>
+                      <span style={styles.prizeText}>{raspadinha.premios.nome}</span>
+                      <span style={styles.prizeCode}>#{raspadinha.id.slice(0,4)}</span>
                     </div>
                   </ScratchCard>
-                  <p style={styles.instruction}>Arraste o mouse ou dedo para raspar!</p>
                 </div>
               ) : (
                 <div style={styles.emptyState}>
-                  <span style={{fontSize: '40px'}}>😢</span>
-                  <p style={{color: '#6b7280', marginTop: '10px'}}>Nenhuma raspadinha disponível no momento.</p>
-                  <button style={styles.secondaryButton}>Atualizar</button>
+                  <div style={{fontSize: '40px', marginBottom: '10px'}}>😢</div>
+                  <h3 style={{color: '#374151', margin: 0}}>Nenhuma raspadinha disponível</h3>
+                  <p style={{color: '#6b7280', fontSize: '14px'}}>Peça para o seu gestor liberar uma para você!</p>
+                  <button onClick={() => window.location.reload()} style={styles.secondaryButton}>Atualizar Página</button>
                 </div>
               )}
             </div>
@@ -126,7 +135,7 @@ export default function Dashboard() {
 
           {/* Feed de Ganhadores */}
           <div style={styles.card}>
-            <h2 style={styles.cardTitle}>🏆 Feed de Prêmios Recentes</h2>
+            <h2 style={styles.cardTitle}>🏆 Feed de Prêmios</h2>
             <ul style={styles.feedList}>
               {feedGanhadores.map((item, index) => (
                 <li key={index} style={styles.feedItem}>
@@ -149,24 +158,20 @@ export default function Dashboard() {
           {/* Histórico */}
           <div style={styles.card}>
             <h2 style={styles.cardTitle}><History size={20} style={{marginRight: 8, color: '#2563eb'}}/> Histórico</h2>
-            <ul style={styles.historyList}>
-              {historicoPremios.map((item, index) => (
-                <li key={index} style={styles.historyItem}>
-                  <span style={{color: '#6b7280', fontSize: '13px'}}>{item.data}</span>
-                  <span style={{fontWeight: '500', color: '#1f2937'}}>{item.premio}</span>
-                </li>
-              ))}
-              {historicoPremios.length === 0 && <li style={styles.emptyText}>Você ainda não ganhou prêmios.</li>}
-            </ul>
+            <div style={styles.emptyHistory}>
+              <p>Você ainda não tem prêmios resgatados.</p>
+            </div>
           </div>
 
           {/* Indique */}
           <div style={{...styles.card, backgroundColor: '#eff6ff', border: '1px solid #bfdbfe'}}>
-            <h2 style={{...styles.cardTitle, color: '#1e40af'}}><Share2 size={20} style={{marginRight: 8}}/> Indique</h2>
-            <p style={{fontSize: '14px', color: '#1e3a8a', marginBottom: '15px'}}>
-              Conhece alguém que merece um prêmio? Indique um colega para o time de R&E!
+            <h2 style={{...styles.cardTitle, color: '#1e40af', borderBottom: '1px solid #dbeafe'}}>
+              <Share2 size={20} style={{marginRight: 8}}/> Indique
+            </h2>
+            <p style={{fontSize: '13px', color: '#1e3a8a', marginBottom: '15px', lineHeight: '1.4'}}>
+              Indique um colega para o time de R&E e concorra a prêmios especiais!
             </p>
-            <button style={styles.primaryButton}>Indicar Colega</button>
+            <button style={styles.primaryButton}>Indicar Agora</button>
           </div>
 
         </section>
@@ -176,61 +181,59 @@ export default function Dashboard() {
   );
 }
 
-// --- ESTILOS (CSS-in-JS para não bugar) ---
+// --- ESTILOS RESPONSIVOS ---
 const styles = {
-  loading: { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: '#6b7280' },
+  loading: { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: '#6b7280', fontFamily: 'sans-serif' },
   container: {
     minHeight: '100vh',
-    backgroundColor: '#f3f4f6', // Cinza bem clarinho de fundo
+    backgroundColor: '#f3f4f6',
     fontFamily: '"Inter", sans-serif',
   },
   header: {
-    backgroundColor: '#1e40af', // Azul do Login
-    padding: '15px 30px',
+    backgroundColor: '#1e40af',
+    padding: '0 20px',
+    height: '60px',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     color: 'white',
-    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   },
   logoContainer: { display: 'flex', alignItems: 'center' },
-  logoText: { fontSize: '20px', fontWeight: 'bold', margin: 0 },
-  userInfo: { display: 'flex', alignItems: 'center', gap: '20px' },
-  welcomeText: { fontSize: '14px' },
+  logoText: { fontSize: '18px', fontWeight: 'bold', margin: 0 },
+  userInfo: { display: 'flex', alignItems: 'center', gap: '15px' },
+  userDetails: { textAlign: 'right', display: 'flex', flexDirection: 'column' },
+  userName: { fontSize: '14px', lineHeight: '1' },
+  userArea: { fontSize: '11px', opacity: 0.8 },
   logoutButton: {
-    background: 'rgba(255,255,255,0.2)',
+    background: 'rgba(255,255,255,0.1)',
     border: 'none',
     color: 'white',
-    padding: '8px 12px',
+    padding: '8px',
     borderRadius: '6px',
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
-    gap: '5px',
-    fontSize: '13px',
   },
+  logoutText: { marginLeft: '5px', display: 'none', '@media(min-width: 600px)': { display: 'inline' } }, // Esconde texto no mobile
+  
   mainGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', // Responsivo
+    gridTemplateColumns: '1fr', // Mobile first (1 coluna)
     gap: '20px',
-    padding: '30px',
-    maxWidth: '1200px',
+    padding: '20px',
+    maxWidth: '1000px',
     margin: '0 auto',
   },
-  // No Desktop, força a divisão 2/3 e 1/3 se houver espaço
-  '@media (min-width: 768px)': {
-    mainGrid: {
-      gridTemplateColumns: '2fr 1fr', 
-    }
-  },
-  leftColumn: { display: 'flex', flexDirection: 'column', gap: '20px', flex: 2 }, // Flex Grow maior
-  rightColumn: { display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }, // Flex Grow menor
+  leftColumn: { display: 'flex', flexDirection: 'column', gap: '20px' },
+  rightColumn: { display: 'flex', flexDirection: 'column', gap: '20px' },
 
   card: {
     backgroundColor: 'white',
     borderRadius: '12px',
     padding: '20px',
-    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+    border: '1px solid #e5e7eb',
   },
   cardTitle: {
     fontSize: '16px',
@@ -241,78 +244,43 @@ const styles = {
     alignItems: 'center',
     borderBottom: '1px solid #f3f4f6',
     paddingBottom: '10px',
+    margin: '0 0 15px 0',
   },
   scratchArea: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    minHeight: '200px',
+    minHeight: '250px',
     backgroundColor: '#f9fafb',
     borderRadius: '8px',
     padding: '20px',
+    border: '2px dashed #e5e7eb',
   },
-  scratchWrapper: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  prizeCard: {
-    width: '320px',
-    height: '160px',
-    backgroundColor: '#fef3c7', // Amarelo clarinho (ouro)
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    border: '2px dashed #ca8a04',
-    borderRadius: '8px',
-  },
-  prizeText: {
-    fontSize: '24px',
-    fontWeight: 'bold',
-    color: '#854d0e',
-  },
-  instruction: {
-    fontSize: '12px',
-    color: '#9ca3af',
-    marginTop: '10px',
-  },
-  emptyState: {
-    textAlign: 'center',
-    padding: '20px',
-  },
-  feedList: { listStyle: 'none', padding: 0, margin: 0 },
-  feedItem: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '10px 0',
-    borderBottom: '1px solid #f3f4f6',
-    fontSize: '14px',
-  },
-  avatar: {
-    width: '32px',
-    height: '32px',
-    backgroundColor: '#bfdbfe',
-    color: '#1e40af',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: 'bold',
-    marginRight: '10px',
-    fontSize: '12px',
-  },
-  feedTime: { fontSize: '12px', color: '#9ca3af' },
+  scratchWrapper: { display: 'flex', flexDirection: 'column', alignItems: 'center' },
+  instruction: { fontSize: '14px', color: '#6b7280', marginBottom: '10px', fontWeight: '500' },
   
-  historyList: { listStyle: 'none', padding: 0, margin: 0 },
-  historyItem: {
+  prizeCard: {
+    width: '300px',
+    height: '300px',
+    backgroundColor: '#fffbeb',
     display: 'flex',
-    justifyContent: 'space-between',
-    padding: '10px 0',
-    borderBottom: '1px solid #f3f4f6',
-    fontSize: '14px',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    border: '1px solid #fcd34d',
   },
-  emptyText: { fontSize: '13px', color: '#9ca3af', fontStyle: 'italic', textAlign: 'center', margin: '10px 0' },
+  prizeText: { fontSize: '22px', fontWeight: 'bold', color: '#b45309', textAlign: 'center', margin: '10px 0' },
+  prizeCode: { fontSize: '12px', color: '#92400e', fontFamily: 'monospace', background: '#fde68a', padding: '2px 6px', borderRadius: '4px' },
+
+  emptyState: { textAlign: 'center' },
+  secondaryButton: { marginTop: '15px', padding: '8px 16px', background: 'white', border: '1px solid #d1d5db', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' },
+  
+  feedList: { listStyle: 'none', padding: 0, margin: 0 },
+  feedItem: { display: 'flex', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f3f4f6', fontSize: '13px' },
+  avatar: { width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#bfdbfe', color: '#1e40af', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', marginRight: '10px', fontSize: '12px' },
+  feedTime: { fontSize: '11px', color: '#9ca3af', marginLeft: 'auto' },
+
+  emptyHistory: { textAlign: 'center', color: '#9ca3af', fontSize: '13px', fontStyle: 'italic', padding: '20px 0' },
   
   primaryButton: {
     width: '100%',
@@ -323,15 +291,15 @@ const styles = {
     borderRadius: '6px',
     fontWeight: 'bold',
     cursor: 'pointer',
-  },
-  secondaryButton: {
-    padding: '8px 16px',
-    backgroundColor: 'white',
-    border: '1px solid #d1d5db',
-    color: '#374151',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    marginTop: '10px',
-    fontWeight: '500',
+    fontSize: '14px',
   }
 };
+
+// Hack para Media Queries no React inline (simples)
+const styleSheet = document.createElement("style");
+styleSheet.innerText = `
+  @media (min-width: 768px) {
+    main { grid-template-columns: 2fr 1fr !important; }
+  }
+`;
+document.head.appendChild(styleSheet);
