@@ -124,7 +124,7 @@ export default function Dashboard() {
               {raspadinha && raspadinha.premios ? (
                 <div style={styles.scratchWrapper}>
                   {!revelado && <p style={styles.instruction}>✨ Arraste para revelar! ✨</p>}
-                  <ScratchCard width={300} height={300} image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png" finishPercent={40} onComplete={onComplete}>
+                  <ScratchCard width={300} height={300} image="https://i.postimg.cc/C559D33F/Design-sem-nome.png" finishPercent={40} onComplete={onComplete}>
                     <div style={styles.prizeCard}>
                       <Trophy size={48} color="#d97706" style={{marginBottom: 10}}/>
                       <span style={styles.prizeText}>{raspadinha.premios.nome}</span>
