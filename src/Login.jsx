@@ -13,23 +13,29 @@ export default function Login() {
   const [area, setArea] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  const handleAuth = async (e) => {
+const handleAuth = async (e) => {
     e.preventDefault();
     setLoading(true);
     setErrorMsg('');
 
     try {
       if (isSignUp) {
+        // MUDANÇA AQUI: Enviamos os dados DENTRO do signUp
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              nome_completo: name, // Usando o nome que o gatilho espera
+              area: area
+            }
+          }
         });
+
         if (authError) throw authError;
-        if (authData.user) {
-          await supabase.from('perfis').insert([{ id: authData.user.id, nome: name, area: area }]);
-        }
         alert('Cadastro realizado com sucesso!');
         setIsSignUp(false);
+
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
