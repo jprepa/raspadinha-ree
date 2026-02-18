@@ -3,7 +3,7 @@ import { supabase } from './supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import ScratchCard from 'react-scratchcard-v2';
 import confetti from 'canvas-confetti';
-import { Ticket, Gift, History, Share2, LogOut, Trophy, User, Clock } from 'lucide-react';
+import { Ticket, Gift, History, Share2, LogOut, Trophy } from 'lucide-react';
 
 export default function Dashboard() {
   const [userProfile, setUserProfile] = useState(null);
@@ -28,24 +28,23 @@ export default function Dashboard() {
       if (!perfil) perfil = { nome: user.email?.split('@')[0] || 'Usuário', area: 'Visitante' };
       setUserProfile(perfil);
 
-      // 2. Raspadinha ATIVA (CORREÇÃO CRÍTICA AQUI)
-      const { data: raspData, error: raspError } = await supabase
+      // 2. Raspadinha ATIVA (CORREÇÃO DE SEGURANÇA AQUI)
+      const { data: raspData } = await supabase
         .from('historico_raspadinhas')
         .select('*, premios(*)')
         .eq('usuario_id', user.id)
         .eq('revelada', false)
-        .not('premio_id', 'is', null) // Ignora raspadinhas quebradas (sem prêmio)
-        .limit(1) // Pega APENAS UMA da pilha
+        .not('premio_id', 'is', null) // Ignora raspadinhas sem prêmio
+        .limit(1) // Pega apenas UMA, mesmo que tenham 10 acumuladas
         .maybeSingle();
       
-      if (raspError) console.error("Erro ao buscar raspadinha:", raspError);
       setRaspadinha(raspData);
 
       // 3. Feed Global
       const { data: feedData } = await supabase
         .from('historico_raspadinhas')
         .select('created_at, revelada, premios(nome), perfis(nome)')
-        .eq('revelada', true) // Só mostra as que JÁ FORAM jogadas
+        .eq('revelada', true)
         .order('created_at', { ascending: false })
         .limit(5);
       
@@ -56,13 +55,13 @@ export default function Dashboard() {
         .from('historico_raspadinhas')
         .select('created_at, premios(nome)')
         .eq('usuario_id', user.id)
-        .eq('revelada', true) // Só mostra as que JÁ FORAM jogadas
+        .eq('revelada', true)
         .order('created_at', { ascending: false });
 
       if (histData) setMeuHistorico(histData);
 
     } catch (error) {
-      console.error("Erro geral no dashboard:", error);
+      console.error("Erro dashboard:", error);
     } finally {
       setLoading(false);
     }
@@ -79,22 +78,16 @@ export default function Dashboard() {
     confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, zIndex: 9999 });
     
     // Atualiza no banco
-    const { error } = await supabase
+    await supabase
       .from('historico_raspadinhas')
       .update({ revelada: true })
       .eq('id', raspadinha.id);
-
-    if (error) {
-      console.error("Erro ao salvar vitória:", error);
-      alert("Erro ao salvar! Verifique sua conexão.");
-    } else {
-      alert(`PARABÉNS! Você ganhou: ${raspadinha.premios?.nome}`);
-      window.location.reload(); // Recarrega para atualizar feed e pegar a próxima
-    }
+      
+    alert(`PARABÉNS! Você ganhou: ${raspadinha.premios?.nome || 'Um Prêmio!'}`);
+    window.location.reload(); 
   };
 
   const formatTime = (dateString) => {
-    if (!dateString) return '';
     const date = new Date(dateString);
     const now = new Date();
     const diff = Math.floor((now - date) / 60000);
@@ -105,11 +98,10 @@ export default function Dashboard() {
     return date.toLocaleDateString('pt-BR');
   };
 
-  if (loading) return <div style={styles.loading}>Carregando painel...</div>;
+  if (loading) return <div style={styles.loading}>Carregando...</div>;
 
   return (
     <div style={styles.container}>
-      {/* HEADER */}
       <header style={styles.header}>
         <div style={styles.logoContainer}>
           <Ticket color="#fff" size={24} style={{ marginRight: 10 }} />
@@ -120,33 +112,19 @@ export default function Dashboard() {
             <span style={styles.userName}>Olá, <b>{userProfile?.nome}</b></span>
             <span style={styles.userArea}>{userProfile?.area}</span>
           </div>
-          <button onClick={handleLogout} style={styles.logoutButton}>
-            <LogOut size={18} />
-          </button>
+          <button onClick={handleLogout} style={styles.logoutButton}><LogOut size={18} /></button>
         </div>
       </header>
 
-      {/* GRID */}
       <main style={styles.mainGrid}>
-        
-        {/* ESQUERDA */}
         <section style={styles.leftColumn}>
           <div style={styles.card}>
-            <h2 style={styles.cardTitle}>
-              <Gift size={20} style={{marginRight: 8, color: '#2563eb'}}/> 
-              Suas Raspadinhas
-            </h2>
+            <h2 style={styles.cardTitle}><Gift size={20} style={{marginRight: 8, color: '#2563eb'}}/> Suas Raspadinhas</h2>
             <div style={styles.scratchArea}>
               {raspadinha && raspadinha.premios ? (
                 <div style={styles.scratchWrapper}>
-                  {!revelado && <p style={styles.instruction}>✨ Arraste para revelar seu prêmio! ✨</p>}
-                  <ScratchCard
-                    width={300}
-                    height={300}
-                    image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png"
-                    finishPercent={40}
-                    onComplete={onComplete}
-                  >
+                  {!revelado && <p style={styles.instruction}>✨ Arraste para revelar! ✨</p>}
+                  <ScratchCard width={300} height={300} image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png" finishPercent={40} onComplete={onComplete}>
                     <div style={styles.prizeCard}>
                       <Trophy size={48} color="#d97706" style={{marginBottom: 10}}/>
                       <span style={styles.prizeText}>{raspadinha.premios.nome}</span>
@@ -156,9 +134,9 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <div style={styles.emptyState}>
-                  <div style={{fontSize: '40px', marginBottom: '10px'}}>😢</div>
-                  <h3 style={{color: '#374151', margin: 0}}>Nenhuma raspadinha disponível</h3>
-                  <p style={{color: '#6b7280', fontSize: '14px', marginTop: 5}}>Peça para o admin liberar!</p>
+                  <div style={{fontSize: '40px'}}>😢</div>
+                  <h3 style={{color: '#374151', margin: '10px 0'}}>Sem raspadinhas</h3>
+                  <p style={{color: '#6b7280', fontSize: '14px'}}>Aguarde novas liberações!</p>
                   <button onClick={() => window.location.reload()} style={styles.secondaryButton}>Atualizar</button>
                 </div>
               )}
@@ -166,7 +144,7 @@ export default function Dashboard() {
           </div>
 
           <div style={styles.card}>
-            <h2 style={styles.cardTitle}>🏆 Últimos Ganhadores</h2>
+            <h2 style={styles.cardTitle}>🏆 Feed de Prêmios</h2>
             <ul style={styles.feedList}>
               {feed.length > 0 ? feed.map((item, index) => (
                 <li key={index} style={styles.feedItem}>
@@ -176,14 +154,11 @@ export default function Dashboard() {
                   </div>
                   <span style={styles.feedTime}>{formatTime(item.created_at)}</span>
                 </li>
-              )) : (
-                <li style={styles.emptyText}>Nenhum prêmio resgatado ainda. Jogue agora!</li>
-              )}
+              )) : <li style={styles.emptyText}>Sem ganhadores recentes.</li>}
             </ul>
           </div>
         </section>
 
-        {/* DIREITA */}
         <section style={styles.rightColumn}>
           <div style={styles.card}>
             <h2 style={styles.cardTitle}><History size={20} style={{marginRight: 8, color: '#2563eb'}}/> Histórico</h2>
@@ -193,16 +168,12 @@ export default function Dashboard() {
                   <span style={{color: '#6b7280', fontSize: '12px'}}>{new Date(item.created_at).toLocaleDateString()}</span>
                   <span style={{fontWeight: '600', color: '#1f2937', fontSize: '13px'}}>{item.premios?.nome}</span>
                 </li>
-              )) : (
-                <div style={styles.emptyHistory}><p>Seus prêmios aparecerão aqui após jogar.</p></div>
-              )}
+              )) : <div style={styles.emptyHistory}><p>Seus prêmios aparecerão aqui.</p></div>}
             </ul>
           </div>
 
           <div style={{...styles.card, backgroundColor: '#eff6ff', border: '1px solid #bfdbfe'}}>
-            <h2 style={{...styles.cardTitle, color: '#1e40af', borderBottom: '1px solid #dbeafe'}}>
-              <Share2 size={20} style={{marginRight: 8}}/> Indique
-            </h2>
+            <h2 style={{...styles.cardTitle, color: '#1e40af', borderBottom: '1px solid #dbeafe'}}><Share2 size={20} style={{marginRight: 8}}/> Indique</h2>
             <p style={{fontSize: '13px', color: '#1e3a8a', marginBottom: '15px'}}>Indique um colega e concorra!</p>
             <button style={styles.primaryButton}>Indicar Agora</button>
           </div>
@@ -212,7 +183,6 @@ export default function Dashboard() {
   );
 }
 
-// Estilos
 const styles = {
   loading: { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: '#6b7280', fontFamily: 'sans-serif' },
   container: { minHeight: '100vh', backgroundColor: '#f3f4f6', fontFamily: '"Inter", sans-serif' },
