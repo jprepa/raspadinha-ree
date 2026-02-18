@@ -143,7 +143,7 @@ export default function Dashboard() {
                 <div style={styles.emptyState}>
                   <div style={{fontSize: '40px'}}>😢</div>
                   <h3 style={{color: '#374151', margin: '10px 0'}}>Sem raspadinhas</h3>
-                  <p style={{color: '#6b7280', fontSize: '14px'}}>Aguarde novas liberações!</p>
+                  <p style={{color: '#6b7280', fontSize: '14px'}}>Indique agora mesmo e ganhe raspadinhas com prêmios exclusivos!</p>
                   <button onClick={() => window.location.reload()} style={styles.secondaryButton}>Atualizar</button>
                 </div>
               )}
@@ -181,7 +181,7 @@ export default function Dashboard() {
 
           <div style={{...styles.card, backgroundColor: '#eff6ff', border: '1px solid #bfdbfe'}}>
             <h2 style={{...styles.cardTitle, color: '#1e40af', borderBottom: '1px solid #dbeafe'}}><Share2 size={20} style={{marginRight: 8}}/> Indique</h2>
-            <p style={{fontSize: '13px', color: '#1e3a8a', marginBottom: '15px'}}>Indique agora mesmo e ganhe uma raspadinha!</p>
+            <p style={{fontSize: '13px', color: '#1e3a8a', marginBottom: '15px'}}>Ao Indicar, certifique-se de preencher o nome igual ao da Plataforma</p>
             <button style={styles.primaryButton}>Indicar Agora</button>
           </div>
         </section>
