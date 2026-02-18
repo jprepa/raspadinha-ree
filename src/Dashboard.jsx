@@ -124,13 +124,20 @@ export default function Dashboard() {
               {raspadinha && raspadinha.premios ? (
                 <div style={styles.scratchWrapper}>
                   {!revelado && <p style={styles.instruction}>✨ Arraste para revelar! ✨</p>}
-                  <ScratchCard width={300} height={300} image="https://i.postimg.cc/RZthKym7/Design-sem-nome-(1).png" finishPercent={40} onComplete={onComplete}>
-                    <div style={styles.prizeCard}>
-                      <Trophy size={48} color="#d97706" style={{marginBottom: 10}}/>
-                      <span style={styles.prizeText}>{raspadinha.premios.nome}</span>
-                      <span style={styles.prizeCode}>#{raspadinha.id.slice(0,4)}</span>
-                    </div>
-                  </ScratchCard>
+                  <ScratchCard
+  width={300}
+  height={300}
+  image="https://i.postimg.cc/RZthKym7/Design-sem-nome-(1).png" 
+  finishPercent={70} // Aumentado para 70%: agora o usuário precisa limpar quase tudo para revelar
+  onComplete={onComplete}
+  brushSize={20}    // Pincel um pouco menor para exigir mais movimentos
+>
+  <div style={styles.prizeCard}>
+    <Trophy size={48} color="#d97706" style={{marginBottom: 10}}/>
+    <span style={styles.prizeText}>{raspadinha.premios.nome}</span>
+    <span style={styles.prizeCode}>#{raspadinha.id.slice(0,4)}</span>
+  </div>
+</ScratchCard>
                 </div>
               ) : (
                 <div style={styles.emptyState}>
@@ -202,7 +209,7 @@ const styles = {
   scratchArea: { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '320px', backgroundColor: '#f9fafb', borderRadius: '8px', padding: '20px', border: '2px dashed #e5e7eb' },
   scratchWrapper: { display: 'flex', flexDirection: 'column', alignItems: 'center' },
   instruction: { fontSize: '14px', color: '#6b7280', marginBottom: '10px', fontWeight: '600' },
-  prizeCard: { width: '300px', height: '300px', backgroundColor: '#fffbeb', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', border: '1px solid #fcd34d', borderRadius: '4px' },
+  prizeCard: { width: '300px', height: '300px', backgroundColor: '#fffbeb', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', border: '1px solid #fcd34d', borderRadius: '1px' },
   prizeText: { fontSize: '24px', fontWeight: 'bold', color: '#b45309', textAlign: 'center', margin: '15px 0' },
   prizeCode: { fontSize: '12px', color: '#92400e', fontFamily: 'monospace', background: '#fde68a', padding: '2px 6px', borderRadius: '4px' },
   emptyState: { textAlign: 'center', padding: '20px' },
