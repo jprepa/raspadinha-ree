@@ -55,9 +55,9 @@ const handleAuth = async (e) => {
         <div style={styles.header}>
           {/* Use a logo oficial se tiver o link dela, por enquanto usando a do exemplo */}
           <img src="https://i.postimg.cc/qMcJsMgT/logo.png" alt="Prevision Logo" style={styles.logo} />
-          <h2 style={styles.title}>{isSignUp ? 'Crie sua Conta' : 'Bem-vindo de volta!'}</h2>
+          <h2 style={styles.title}>{isSignUp ? 'Crie sua Conta' : 'Raspadinha R&E'}</h2>
           <p style={styles.subtitle}>
-            {isSignUp ? 'Preencha os dados para participar' : 'Insira suas credenciais para acessar'}
+            {isSignUp ? 'Preencha os dados para criar sua conta' : 'Insira suas credenciais para acessar'}
           </p>
         </div>
 
@@ -68,7 +68,7 @@ const handleAuth = async (e) => {
               <input type="text" placeholder="Área (Ex: Marketing)" value={area} onChange={(e) => setArea(e.target.value)} style={styles.input} required />
             </>
           )}
-          <input type="email" placeholder="E-mail corporativo" value={email} onChange={(e) => setEmail(e.target.value)} style={styles.input} required />
+          <input type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} style={styles.input} required />
           <input type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} style={styles.input} required />
 
           {errorMsg && <p style={styles.error}>{errorMsg}</p>}
