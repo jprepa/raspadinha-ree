@@ -105,7 +105,7 @@ export default function Dashboard() {
       <header style={styles.header}>
         <div style={styles.logoContainer}>
           <Ticket color="#fff" size={24} style={{ marginRight: 10 }} />
-          <h1 style={styles.logoText}>Raspadinhas <span style={{color: '#93c5fd'}}>R&E</span></h1>
+          <h1 style={styles.logoText}>Raspadinhas Indicação <span style={{color: '#93c5fd'}}>R&E</span></h1>
         </div>
         <div style={styles.userInfo}>
           <div style={styles.userDetails}>
@@ -181,7 +181,7 @@ export default function Dashboard() {
 
           <div style={{...styles.card, backgroundColor: '#eff6ff', border: '1px solid #bfdbfe'}}>
             <h2 style={{...styles.cardTitle, color: '#1e40af', borderBottom: '1px solid #dbeafe'}}><Share2 size={20} style={{marginRight: 8}}/> Indique</h2>
-            <p style={{fontSize: '13px', color: '#1e3a8a', marginBottom: '15px'}}>Indique um colega e concorra!</p>
+            <p style={{fontSize: '13px', color: '#1e3a8a', marginBottom: '15px'}}>Indique agora mesmo e ganhe uma raspadinha!</p>
             <button style={styles.primaryButton}>Indicar Agora</button>
           </div>
         </section>
