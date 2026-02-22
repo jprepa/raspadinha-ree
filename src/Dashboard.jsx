@@ -146,12 +146,12 @@ const onComplete = async () => {
             <h2 style={styles.cardTitle}><Gift size={20} style={{marginRight: 8, color: '#2563eb'}}/> Suas Raspadinhas</h2>
             <div style={styles.scratchArea}>
               {raspadinha && raspadinha.premios ? (
-        <div style={styles.scratchWrapper}>
+     <div style={styles.scratchWrapper}>
   {!revelado && <p style={styles.instruction}>✨ Arraste para revelar! ✨</p>}
 
   {isFakePrize ? (
     <ScratchCard
-      key={`fake-${raspadinha.id}`} {/* 👈 A MÁGICA ESTÁ AQUI */}
+      key={`fake-${raspadinha.id}`}
       width={300}
       height={300}
       image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png" 
@@ -167,7 +167,7 @@ const onComplete = async () => {
     </ScratchCard>
   ) : (
     <ScratchCard
-      key={`real-${raspadinha.id}`} {/* 👈 A MÁGICA ESTÁ AQUI TAMBÉM */}
+      key={`real-${raspadinha.id}`}
       width={300}
       height={300}
       image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png" 
