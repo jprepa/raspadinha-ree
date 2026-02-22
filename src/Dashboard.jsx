@@ -97,7 +97,7 @@ const onComplete = async () => {
     // Mensagem personalizada dependendo do tipo
     if (isFake) {
       // Mensagem mais séria, sem "Parabéns"
-      alert(`${raspadinha.premios?.nome}.\nNão desanime, continue indicando empresas para ganhar sua raspadinha!\nSe tiver alguma dúvida entre em contato com o time de R&E.`);
+      alert(`${raspadinha.premios?.nome}.\n\nNão desanime, continue indicando empresas para ganhar sua raspadinha!\n\nSe tiver alguma dúvida entre em contato com o time de R&E.`);
     } else {
       // Mensagem de festa normal
       alert(`PARABÉNS! Você ganhou: ${raspadinha.premios?.nome || 'Um Prêmio!'}`);
