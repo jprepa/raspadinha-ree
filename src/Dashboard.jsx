@@ -146,26 +146,52 @@ const onComplete = async () => {
             <h2 style={styles.cardTitle}><Gift size={20} style={{marginRight: 8, color: '#2563eb'}}/> Suas Raspadinhas</h2>
             <div style={styles.scratchArea}>
               {raspadinha && raspadinha.premios ? (
-                <div style={styles.scratchWrapper}>
-                  {!revelado && <p style={styles.instruction}>✨ Arraste para revelar! ✨</p>}
-<ScratchCard
-  width={300}
-  height={300}
-  image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png" 
-  finishPercent={70} 
-  onComplete={onComplete}
-  brushSize={20}
->
-  <div style={styles.prizeCard}>
-    
-    <IconeDinamico size={48} color={corIcone} style={{marginBottom: 10}} />
+         <div style={styles.scratchWrapper}>
+  {!revelado && <p style={styles.instruction}>✨ Arraste para revelar! ✨</p>}
 
-    <span style={styles.prizeText}>{raspadinha.premios?.nome}</span>
-    <span style={styles.prizeCode}>#{raspadinha.id.slice(0,4)}</span>
-    
-  </div>
-</ScratchCard>
-                </div>
+  {/* O REACT DECIDE QUAL RASPADINHA MOSTRAR BASEADO NA VARIÁVEL QUE CRIAMOS LÁ EM CIMA */}
+  {isFakePrize ? (
+
+    /* =========================================
+       1. RASPADINHA DA INDICAÇÃO INVÁLIDA (☹️)
+       ========================================= */
+    <ScratchCard
+      width={300}
+      height={300}
+      image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png" 
+      finishPercent={70} 
+      onComplete={onComplete}
+      brushSize={20}
+    >
+      <div style={styles.prizeCard}>
+        <Frown size={48} color="#ef4444" style={{marginBottom: 10}}/>
+        <span style={styles.prizeText}>{raspadinha.premios?.nome}</span>
+        <span style={styles.prizeCode}>#{raspadinha.id.slice(0,4)}</span>
+      </div>
+    </ScratchCard>
+
+  ) : (
+
+    /* =========================================
+       2. RASPADINHA DO PRÊMIO REAL (🏆)
+       ========================================= */
+    <ScratchCard
+      width={300}
+      height={300}
+      image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png" 
+      finishPercent={70} 
+      onComplete={onComplete}
+      brushSize={20}
+    >
+      <div style={styles.prizeCard}>
+        <Trophy size={48} color="#d97706" style={{marginBottom: 10}}/>
+        <span style={styles.prizeText}>{raspadinha.premios?.nome}</span>
+        <span style={styles.prizeCode}>#{raspadinha.id.slice(0,4)}</span>
+      </div>
+    </ScratchCard>
+
+  )}
+</div>
               ) : (
                 <div style={styles.emptyState}>
                   <div style={{fontSize: '40px'}}>😢</div>
