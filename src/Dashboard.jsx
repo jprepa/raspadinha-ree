@@ -72,18 +72,34 @@ export default function Dashboard() {
     navigate('/');
   };
 
-  const onComplete = async () => {
+const onComplete = async () => {
     if (!raspadinha) return;
     setRevelado(true);
-    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, zIndex: 9999 });
+
+    // --- O PORTEIRO DA RASPADINHA ---
+    // Verifica se o prêmio é do tipo "falso" (feedback negativo)
+    const isFake = raspadinha.premios?.eh_premio_falso === true;
+
+    // Só solta confete se NÃO for fake
+    if (!isFake) {
+      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, zIndex: 9999 });
+    }
     
-    // Atualiza no banco
+    // Atualiza no banco que foi revelada (isso acontece sempre)
     await supabase
       .from('historico_raspadinhas')
       .update({ revelada: true })
       .eq('id', raspadinha.id);
       
-    alert(`PARABÉNS! Você ganhou: ${raspadinha.premios?.nome || 'Um Prêmio!'}`);
+    // Mensagem personalizada dependendo do tipo
+    if (isFake) {
+      // Mensagem mais séria, sem "Parabéns"
+      alert(`Resultado: ${raspadinha.premios?.nome}.\n\nContinue indicando empresas válidas para ganhar!`);
+    } else {
+      // Mensagem de festa normal
+      alert(`PARABÉNS! Você ganhou: ${raspadinha.premios?.nome || 'Um Prêmio!'}`);
+    }
+
     window.location.reload(); 
   };
 
