@@ -57,7 +57,7 @@ const handleAuth = async (e) => {
           <img src="https://i.postimg.cc/qMcJsMgT/logo.png" alt="Prevision Logo" style={styles.logo} />
           <h2 style={styles.title}>{isSignUp ? 'Crie sua Conta' : 'Raspadinha R&E'}</h2>
           <p style={styles.subtitle}>
-            {isSignUp ? 'Preencha os dados para criar sua conta' : 'Insira suas credenciais para acessar'}
+            {isSignUp ? 'Preencha os dados para criar sua conta' : 'Indique e ganhe Raspadinhas 😁'}
           </p>
         </div>
 
