@@ -126,7 +126,6 @@ const onComplete = async () => {
 
   return (
     <div style={styles.container}>
-    <div style={styles.container}>
       <header style={styles.header}>
         <div style={styles.logoContainer}>
           <Ticket color="#fff" size={24} style={{ marginRight: 10 }} />
