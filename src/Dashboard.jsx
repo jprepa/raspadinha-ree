@@ -146,16 +146,12 @@ const onComplete = async () => {
             <h2 style={styles.cardTitle}><Gift size={20} style={{marginRight: 8, color: '#2563eb'}}/> Suas Raspadinhas</h2>
             <div style={styles.scratchArea}>
               {raspadinha && raspadinha.premios ? (
-         <div style={styles.scratchWrapper}>
+        <div style={styles.scratchWrapper}>
   {!revelado && <p style={styles.instruction}>✨ Arraste para revelar! ✨</p>}
 
-  {/* O REACT DECIDE QUAL RASPADINHA MOSTRAR BASEADO NA VARIÁVEL QUE CRIAMOS LÁ EM CIMA */}
   {isFakePrize ? (
-
-    /* =========================================
-       1. RASPADINHA DA INDICAÇÃO INVÁLIDA (☹️)
-       ========================================= */
     <ScratchCard
+      key={`fake-${raspadinha.id}`} {/* 👈 A MÁGICA ESTÁ AQUI */}
       width={300}
       height={300}
       image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png" 
@@ -169,13 +165,9 @@ const onComplete = async () => {
         <span style={styles.prizeCode}>#{raspadinha.id.slice(0,4)}</span>
       </div>
     </ScratchCard>
-
   ) : (
-
-    /* =========================================
-       2. RASPADINHA DO PRÊMIO REAL (🏆)
-       ========================================= */
     <ScratchCard
+      key={`real-${raspadinha.id}`} {/* 👈 A MÁGICA ESTÁ AQUI TAMBÉM */}
       width={300}
       height={300}
       image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png" 
@@ -189,7 +181,6 @@ const onComplete = async () => {
         <span style={styles.prizeCode}>#{raspadinha.id.slice(0,4)}</span>
       </div>
     </ScratchCard>
-
   )}
 </div>
               ) : (
