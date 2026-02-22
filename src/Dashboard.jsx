@@ -119,7 +119,13 @@ const onComplete = async () => {
 
   if (loading) return <div style={styles.loading}>Carregando...</div>;
 
+  // LÓGICA DO ÍCONE (Resolvemos antes de desenhar a tela)
+  const isFakePrize = raspadinha?.premios?.eh_premio_falso === true;
+  const IconeDinamico = isFakePrize ? Frown : Trophy;
+  const corIcone = isFakePrize ? "#ef4444" : "#d97706";
+
   return (
+    <div style={styles.container}>
     <div style={styles.container}>
       <header style={styles.header}>
         <div style={styles.logoContainer}>
@@ -143,7 +149,7 @@ const onComplete = async () => {
               {raspadinha && raspadinha.premios ? (
                 <div style={styles.scratchWrapper}>
                   {!revelado && <p style={styles.instruction}>✨ Arraste para revelar! ✨</p>}
-         <ScratchCard
+<ScratchCard
   width={300}
   height={300}
   image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png" 
@@ -153,12 +159,8 @@ const onComplete = async () => {
 >
   <div style={styles.prizeCard}>
     
-    {/* LÓGICA DO ÍCONE DINÂMICO */}
-    {raspadinha.premios?.eh_premio_falso === true ? (
-      <Frown size={48} color="#ef4444" style={{marginBottom: 10}}/>
-    ) : (
-      <Trophy size={48} color="#d97706" style={{marginBottom: 10}}/>
-    )}
+    {/* Chama o ícone que já foi decidido lá em cima */}
+    <IconeDinamico size={48} color={corIcone} style={{marginBottom: 10}} />
 
     <span style={styles.prizeText}>{raspadinha.premios?.nome}</span>
     <span style={styles.prizeCode}>#{raspadinha.id.slice(0,4)}</span>
