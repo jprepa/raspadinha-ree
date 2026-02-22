@@ -129,7 +129,7 @@ const onComplete = async () => {
       <header style={styles.header}>
         <div style={styles.logoContainer}>
           <Ticket color="#fff" size={24} style={{ marginRight: 10 }} />
-          <h1 style={styles.logoText}>Raspadinha Indicações <span style={{color: '#93c5fd'}}>R&E</span></h1>
+          <h1 style={styles.logoText}>Raspadinhas Indicações <span style={{color: '#93c5fd'}}>R&E</span></h1>
         </div>
         <div style={styles.userInfo}>
           <div style={styles.userDetails}>
