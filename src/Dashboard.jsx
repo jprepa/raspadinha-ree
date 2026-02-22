@@ -143,7 +143,7 @@ const onComplete = async () => {
               {raspadinha && raspadinha.premios ? (
                 <div style={styles.scratchWrapper}>
                   {!revelado && <p style={styles.instruction}>✨ Arraste para revelar! ✨</p>}
-               <ScratchCard
+              <ScratchCard
   width={300}
   height={300}
   image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png" 
