@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
+
 import { supabase } from './supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import ScratchCard from 'react-scratchcard-v2';
 import confetti from 'canvas-confetti';
-import { Ticket, Gift, History, Share2, LogOut, Trophy } from 'lucide-react';
+
+import { Ticket, Gift, History, Share2, LogOut, Trophy, User, Clock, Frown } from 'lucide-react';
+
 
 export default function Dashboard() {
   const [userProfile, setUserProfile] = useState(null);
@@ -140,17 +143,24 @@ const onComplete = async () => {
               {raspadinha && raspadinha.premios ? (
                 <div style={styles.scratchWrapper}>
                   {!revelado && <p style={styles.instruction}>✨ Arraste para revelar! ✨</p>}
-                  <ScratchCard
+               <ScratchCard
   width={300}
   height={300}
-  image="https://i.postimg.cc/RZthKym7/Design-sem-nome-(1).png" 
-  finishPercent={70} // Aumentado para 70%: agora o usuário precisa limpar quase tudo para revelar
+  image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png" 
+  finishPercent={70} 
   onComplete={onComplete}
-  brushSize={20}    // Pincel um pouco menor para exigir mais movimentos
+  brushSize={20}
 >
   <div style={styles.prizeCard}>
-    <Trophy size={48} color="#d97706" style={{marginBottom: 10}}/>
-    <span style={styles.prizeText}>{raspadinha.premios.nome}</span>
+    
+    {/* LÓGICA DO ÍCONE DINÂMICO */}
+    {raspadinha.premios?.eh_premio_falso === true ? (
+      <Frown size={48} color="#ef4444" style={{marginBottom: 10}}/>
+    ) : (
+      <Trophy size={48} color="#d97706" style={{marginBottom: 10}}/>
+    )}
+
+    <span style={styles.prizeText}>{raspadinha.premios?.nome}</span>
     <span style={styles.prizeCode}>#{raspadinha.id.slice(0,4)}</span>
   </div>
 </ScratchCard>
