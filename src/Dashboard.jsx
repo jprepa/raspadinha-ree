@@ -158,15 +158,11 @@ const onComplete = async () => {
 >
   <div style={styles.prizeCard}>
     
-    {/* LÓGICA DO ÍCONE DINÂMICO */}
-    {raspadinha.premios?.eh_premio_falso === true ? (
-      <Frown size={48} color="#ef4444" style={{marginBottom: 10}}/>
-    ) : (
-      <Trophy size={48} color="#d97706" style={{marginBottom: 10}}/>
-    )}
+    <IconeDinamico size={48} color={corIcone} style={{marginBottom: 10}} />
 
     <span style={styles.prizeText}>{raspadinha.premios?.nome}</span>
     <span style={styles.prizeCode}>#{raspadinha.id.slice(0,4)}</span>
+    
   </div>
 </ScratchCard>
                 </div>
