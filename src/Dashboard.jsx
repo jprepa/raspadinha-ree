@@ -154,7 +154,7 @@ const onComplete = async () => {
       key={`fake-${raspadinha.id}`}
       width={300}
       height={300}
-      image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png" 
+      image="/raspadinha.png"
       finishPercent={70} 
       onComplete={onComplete}
       brushSize={20}
@@ -170,7 +170,7 @@ const onComplete = async () => {
       key={`real-${raspadinha.id}`}
       width={300}
       height={300}
-      image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png" 
+      image="/raspadinha.png"
       finishPercent={70} 
       onComplete={onComplete}
       brushSize={20}
