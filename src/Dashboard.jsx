@@ -143,24 +143,20 @@ const onComplete = async () => {
               {raspadinha && raspadinha.premios ? (
                 <div style={styles.scratchWrapper}>
                   {!revelado && <p style={styles.instruction}>✨ Arraste para revelar! ✨</p>}
-              <ScratchCard
-  width={300}
-  height={300}
-  image="https://i.postimg.cc/Hx3d0L8J/scratch-cover-silver.png" 
-  finishPercent={70} 
-  onComplete={onComplete}
-  brushSize={20}
->
+             <ScratchCard ... (propriedades do card) ... >
   <div style={styles.prizeCard}>
     
-    {/* LÓGICA DO ÍCONE DINÂMICO */}
+    {/* LÓGICA DO ÍCONE DINÂMICO 👇 */}
     {raspadinha.premios?.eh_premio_falso === true ? (
+      // Se for FALSO: Mostra carinha triste vermelha
       <Frown size={48} color="#ef4444" style={{marginBottom: 10}}/>
     ) : (
+      // Se for VERDADEIRO: Mostra o troféu dourado (o que já estava)
       <Trophy size={48} color="#d97706" style={{marginBottom: 10}}/>
     )}
+    {/* FIM DA LÓGICA 👆 */}
 
-    <span style={styles.prizeText}>{raspadinha.premios?.nome}</span>
+    <span style={styles.prizeText}>{raspadinha.premios.nome}</span>
     <span style={styles.prizeCode}>#{raspadinha.id.slice(0,4)}</span>
   </div>
 </ScratchCard>
