@@ -211,7 +211,7 @@ const styles = {
   rightColumn: { display: 'flex', flexDirection: 'column', gap: '20px' },
   card: { backgroundColor: 'white', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #e5e7eb' },
   cardTitle: { fontSize: '16px', fontWeight: 'bold', color: '#1f2937', display: 'flex', alignItems: 'center', borderBottom: '1px solid #f3f4f6', paddingBottom: '12px', margin: '0 0 15px 0' },
-  scratchArea: { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '320px', backgroundColor: '#f9fafb', borderRadius: '8px', padding: '20px', border: '2px dashed #e5e7eb' },
+  scratchArea: { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '320px', backgroundColor: '#f9fafb', borderRadius: '8px', padding: '20px', border: '2px dashed #e5e7eb',touchAction: 'none' },
   scratchWrapper: { display: 'flex', flexDirection: 'column', alignItems: 'center' },
   instruction: { fontSize: '14px', color: '#6b7280', marginBottom: '10px', fontWeight: '600' },
   prizeCard: { width: '300px', height: '300px', backgroundColor: '#fffbeb', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', border: '1px solid #fcd34d', borderRadius: '1px' },
