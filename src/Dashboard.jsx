@@ -187,7 +187,7 @@ const onComplete = async () => {
                 <div style={styles.emptyState}>
                   <div style={{fontSize: '40px'}}>😢</div>
                   <h3 style={{color: '#374151', margin: '10px 0'}}>Sem raspadinhas</h3>
-                  <p style={{color: '#6b7280', fontSize: '14px'}}>Indique e ganhe raspadinhas com prêmios exclusivos!</p>
+                  <p style={{color: '#6b7280', fontSize: '14px'}}>Indique Empresas e ganhe raspadinhas com prêmios exclusivos!</p>
                   <button onClick={() => window.location.reload()} style={styles.secondaryButton}>Atualizar</button>
                 </div>
               )}
