@@ -100,7 +100,7 @@ const onComplete = async () => {
       alert(`${raspadinha.premios?.nome}.\n\nNão desanime, continue indicando empresas para ganhar sua raspadinha!\n\nSe tiver alguma dúvida entre em contato com o time de R&E.`);
     } else {
       // Mensagem de festa normal
-      alert(`PARABÉNS! Você ganhou: ${raspadinha.premios?.nome || 'Um Prêmio!'}`);
+      alert(`PARABÉNS! Você ganhou: ${raspadinha.premios?.nome || 'Um Prêmio!'}\n\nEm breve nosso time entrará em contato para realizar o envio!!`);
     }
 
     window.location.reload(); 
