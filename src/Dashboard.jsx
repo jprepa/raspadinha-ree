@@ -228,7 +228,7 @@ const onComplete = async () => {
             <p style={{fontSize: '13px', color: '#1e3a8a', marginBottom: '15px'}}>Ao Indicar, certifique-se de preencher suas informações como na Plataforma</p>
 <button 
     style={styles.primaryButton}
-    onClick={() => window.open('https://forms.office.com/Pages/ResponsePage.aspx?id=Bh2QGvDdOkyIwp1MVp72eR7GDeU21K9Ovs011XmhO4VUMzRBUUpPT1BMTjJWMEZTUjI1UktVVlBCQi4u', '_blank')}
+    onClick={() => window.open('https://forms.office.com/Pages/ResponsePage.aspx?id=Bh2QGvDdOkyIwp1MVp72eZPCSIMCLwpPg2j6TT0HSopUNlBVNEtXMEZOT1RNVlRZRllFSzIzSkpKSSQlQCN0PWcu', '_blank')}
   >
     Indicar Agora
   </button>
